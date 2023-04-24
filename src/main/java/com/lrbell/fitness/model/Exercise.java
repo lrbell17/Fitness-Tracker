@@ -46,8 +46,8 @@ public class Exercise implements ModelEntity {
     private List<MuscleGroup> muscleGroups;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private long createdAt;
+    private Long createdAt;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private long updatedAt;
+    private Long updatedAt;
 }

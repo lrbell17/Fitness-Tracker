@@ -1,7 +1,7 @@
 package com.lrbell.fitness.api.controller;
 
-import com.lrbell.fitness.api.dto.GenericDto;
-import com.lrbell.fitness.api.response.AbstractResponse;
+import com.lrbell.fitness.api.helpers.dto.GenericDto;
+import com.lrbell.fitness.api.responses.AbstractResponse;
 import com.lrbell.fitness.model.ModelEntity;
 import org.springframework.http.ResponseEntity;
 

@@ -1,4 +1,4 @@
-package com.lrbell.fitness.api.response;
+package com.lrbell.fitness.api.responses;
 
 public class ErrorResponse extends AbstractResponse {
 
