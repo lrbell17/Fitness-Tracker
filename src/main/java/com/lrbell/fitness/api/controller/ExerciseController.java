@@ -9,7 +9,10 @@ import com.lrbell.fitness.api.responses.OkResponse;
 import com.lrbell.fitness.api.responses.ResponseMessage;
 import com.lrbell.fitness.model.Exercise;
 import com.lrbell.fitness.persistence.ExerciseRepository;
+import com.lrbell.fitness.persistence.QueryHelper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -84,8 +87,15 @@ public class ExerciseController implements UpdatableEntityController<Exercise, E
     }
 
     @GetMapping
-    public ResponseEntity<List<ExerciseDto>> query(@RequestParam final String name) {
-        final List<Exercise> exercises = exerciseRepository.findByExerciseNameContainingIgnoreCase(name);
+    public ResponseEntity<List<ExerciseDto>> query(@RequestParam final String name,
+                                                   @RequestParam(required = false) final Integer page,
+                                                   @RequestParam(required = false) final Integer size) {
+
+        final Integer pageNumber = page != null ? page: QueryHelper.DEFAULT_PAGE;
+        final Integer pageSize = size != null ? size: QueryHelper.DEFAULT_PAGE_SIZE;
+        final Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+        final List<Exercise> exercises = exerciseRepository.findByExerciseNameContainingIgnoreCase(name, pageable);
         final List <ExerciseDto> exerciseDtos = new ArrayList<>();
 
         for (final Exercise exercise : exercises) {

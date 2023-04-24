@@ -2,15 +2,21 @@ package com.lrbell.fitness.api.controller;
 
 import com.lrbell.fitness.api.helpers.dto.GenericDto;
 import com.lrbell.fitness.api.helpers.dto.WorkoutDto;
+import com.lrbell.fitness.api.responses.exceptions.UserNotFoundException;
 import com.lrbell.fitness.api.responses.exceptions.WorkoutNotFoundException;
 import com.lrbell.fitness.api.helpers.mappers.WorkoutMapper;
 import com.lrbell.fitness.api.responses.AbstractResponse;
 import com.lrbell.fitness.api.responses.OkResponse;
 import com.lrbell.fitness.api.responses.ResponseMessage;
+import com.lrbell.fitness.model.User;
 import com.lrbell.fitness.model.Workout;
 import com.lrbell.fitness.model.enums.WorkoutState;
+import com.lrbell.fitness.persistence.QueryHelper;
+import com.lrbell.fitness.persistence.UserRepository;
 import com.lrbell.fitness.persistence.WorkoutRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +25,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -29,6 +38,9 @@ public class WorkoutController implements EntityController<Workout, WorkoutDto> 
 
     @Autowired
     private WorkoutRepository workoutRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private WorkoutMapper workoutMapper;
@@ -79,6 +91,29 @@ public class WorkoutController implements EntityController<Workout, WorkoutDto> 
             return ResponseEntity.ok().body(new OkResponse(ResponseMessage.WORKOUT_DELETED, id));
         } else {
             throw new WorkoutNotFoundException(id);
+        }
+    }
+
+    @GetMapping("/list/{userId}")
+    public ResponseEntity<List<WorkoutDto>> listWorkoutsForUser(@PathVariable(value = "userId") final String userId,
+                                                                 @RequestParam(required = false) Integer page,
+                                                                 @RequestParam(required = false) Integer size) {
+        final Optional<User> user = userRepository.findById(userId);
+
+        if (user.isPresent()) {
+            final Integer pageNumber = page != null ? page: QueryHelper.DEFAULT_PAGE;
+            final Integer pageSize = size != null ? size: QueryHelper.DEFAULT_PAGE_SIZE;
+            final Pageable pageable = PageRequest.of(pageNumber, pageSize);
+
+            final List<Workout> workouts = workoutRepository.findByUserOrderByStartTimeDesc(user.get(), pageable);
+            final List<WorkoutDto> workoutDtos = new ArrayList<>();
+
+            for (Workout workout : workouts) {
+                workoutDtos.add(workoutMapper.entityToDto(workout));
+            }
+            return ResponseEntity.ok().body(workoutDtos);
+        } else {
+            throw new UserNotFoundException(userId);
         }
     }
 }
