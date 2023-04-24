@@ -1,6 +1,6 @@
-package com.lrbell.fitness.api.mapper;
+package com.lrbell.fitness.api.helpers.mappers;
 
-import com.lrbell.fitness.api.dto.GenericDto;
+import com.lrbell.fitness.api.helpers.dto.GenericDto;
 import com.lrbell.fitness.model.ModelEntity;
 
 public interface GenericMapper<T extends ModelEntity, U extends GenericDto> {

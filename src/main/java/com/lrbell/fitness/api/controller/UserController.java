@@ -1,16 +1,16 @@
 package com.lrbell.fitness.api.controller;
 
-import com.lrbell.fitness.api.dto.GenericDto;
-import com.lrbell.fitness.api.mapper.UserMapper;
-import com.lrbell.fitness.api.dto.UserDto;
-import com.lrbell.fitness.api.response.AbstractResponse;
-import com.lrbell.fitness.api.response.ErrorResponse;
-import com.lrbell.fitness.api.response.OkResponse;
-import com.lrbell.fitness.api.response.ResponseMessage;
+import com.lrbell.fitness.api.helpers.dto.GenericDto;
+import com.lrbell.fitness.api.responses.exceptions.UserNameNotFoundException;
+import com.lrbell.fitness.api.responses.exceptions.UserNotFoundException;
+import com.lrbell.fitness.api.helpers.mappers.UserMapper;
+import com.lrbell.fitness.api.helpers.dto.UserDto;
+import com.lrbell.fitness.api.responses.AbstractResponse;
+import com.lrbell.fitness.api.responses.OkResponse;
+import com.lrbell.fitness.api.responses.ResponseMessage;
 import com.lrbell.fitness.model.User;
 import com.lrbell.fitness.persistence.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,9 +39,7 @@ public class UserController implements UpdatableEntityController<User, UserDto> 
         final User user = userRepository.findDistinctByUserName(userName);
 
         if (Objects.isNull(user)) {
-            return new ResponseEntity<>(
-                    new ErrorResponse(ResponseMessage.USER_NAME_NOT_FOUND, userName), HttpStatus.NOT_FOUND
-            );
+            throw new UserNameNotFoundException(userName);
         } else {
             return ResponseEntity.ok().body(userMapper.entityToDto(user));
         }
@@ -55,9 +53,7 @@ public class UserController implements UpdatableEntityController<User, UserDto> 
         if (user.isPresent()) {
             return ResponseEntity.ok().body(userMapper.entityToDto(user.get()));
         } else {
-            return new ResponseEntity<>(
-                    new ErrorResponse(ResponseMessage.USER_ID_NOT_FOUND, id), HttpStatus.NOT_FOUND
-            );
+            throw new UserNotFoundException(id);
         }
     }
 
@@ -82,9 +78,7 @@ public class UserController implements UpdatableEntityController<User, UserDto> 
             userRepository.save(userToUpdate);
             return ResponseEntity.ok().body(new OkResponse(ResponseMessage.USER_UPDATED, id));
         } else {
-            return new ResponseEntity<>(
-                    new ErrorResponse(ResponseMessage.USER_ID_NOT_FOUND, id), HttpStatus.NOT_FOUND
-            );
+            throw new UserNotFoundException(id);
         }
     }
 
@@ -96,9 +90,7 @@ public class UserController implements UpdatableEntityController<User, UserDto> 
             userRepository.deleteById(id);
             return ResponseEntity.ok().body(new OkResponse(ResponseMessage.USER_DELETED, id));
         } else {
-            return new ResponseEntity<>(
-                    new ErrorResponse(ResponseMessage.USER_ID_NOT_FOUND, id), HttpStatus.NOT_FOUND
-            );
+            throw new UserNotFoundException(id);
         }
     }
 }

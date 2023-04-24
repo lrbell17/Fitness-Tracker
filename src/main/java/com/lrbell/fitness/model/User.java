@@ -9,6 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
@@ -16,6 +17,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -42,8 +45,11 @@ public class User implements ModelEntity {
     private Gender gender;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private long createdAt;
+    private Long createdAt;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private long updatedAt;
+    private Long updatedAt;
+
+    @OneToMany(mappedBy = "user")
+    private List<Workout> workouts;
 }

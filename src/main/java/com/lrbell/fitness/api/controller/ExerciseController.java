@@ -1,16 +1,15 @@
 package com.lrbell.fitness.api.controller;
 
-import com.lrbell.fitness.api.dto.ExerciseDto;
-import com.lrbell.fitness.api.dto.GenericDto;
-import com.lrbell.fitness.api.mapper.ExerciseMapper;
-import com.lrbell.fitness.api.response.AbstractResponse;
-import com.lrbell.fitness.api.response.ErrorResponse;
-import com.lrbell.fitness.api.response.OkResponse;
-import com.lrbell.fitness.api.response.ResponseMessage;
+import com.lrbell.fitness.api.helpers.dto.ExerciseDto;
+import com.lrbell.fitness.api.helpers.dto.GenericDto;
+import com.lrbell.fitness.api.responses.exceptions.ExerciseNotFoundException;
+import com.lrbell.fitness.api.helpers.mappers.ExerciseMapper;
+import com.lrbell.fitness.api.responses.AbstractResponse;
+import com.lrbell.fitness.api.responses.OkResponse;
+import com.lrbell.fitness.api.responses.ResponseMessage;
 import com.lrbell.fitness.model.Exercise;
 import com.lrbell.fitness.persistence.ExerciseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,9 +43,7 @@ public class ExerciseController implements UpdatableEntityController<Exercise, E
         if (exercise.isPresent()) {
             return ResponseEntity.ok().body(exerciseMapper.entityToDto(exercise.get()));
         } else {
-            return new ResponseEntity<>(
-                    new ErrorResponse(ResponseMessage.EXERCISE_ID_NOT_FOUND, id), HttpStatus.NOT_FOUND
-            );
+            throw new ExerciseNotFoundException(id);
         }
     }
 
@@ -71,9 +68,7 @@ public class ExerciseController implements UpdatableEntityController<Exercise, E
             exerciseRepository.save(exerciseToUpdate);
             return ResponseEntity.ok().body(new OkResponse(ResponseMessage.EXERCISE_UPDATED, id));
         } else {
-            return new ResponseEntity<>(
-                    new ErrorResponse(ResponseMessage.EXERCISE_ID_NOT_FOUND, id), HttpStatus.NOT_FOUND
-            );
+            throw new ExerciseNotFoundException(id);
         }
     }
 
@@ -84,20 +79,16 @@ public class ExerciseController implements UpdatableEntityController<Exercise, E
             exerciseRepository.deleteById(id);
             return ResponseEntity.ok().body(new OkResponse(ResponseMessage.EXERCISE_DELETED, id));
         } else {
-            return new ResponseEntity<>(
-                    new ErrorResponse(ResponseMessage.EXERCISE_ID_NOT_FOUND, id), HttpStatus.NOT_FOUND
-            );
+            throw new ExerciseNotFoundException(id);
         }
     }
 
     @GetMapping
     public ResponseEntity<List<ExerciseDto>> query(@RequestParam final String name) {
-        System.out.println(name);
         final List<Exercise> exercises = exerciseRepository.findByExerciseNameContainingIgnoreCase(name);
         final List <ExerciseDto> exerciseDtos = new ArrayList<>();
 
         for (final Exercise exercise : exercises) {
-            System.out.println(exercise.toString());
             exerciseDtos.add(exerciseMapper.entityToDto(exercise));
         }
         return ResponseEntity.ok().body(exerciseDtos);
