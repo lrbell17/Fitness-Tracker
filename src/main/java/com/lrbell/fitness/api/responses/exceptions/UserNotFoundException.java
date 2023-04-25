@@ -8,7 +8,7 @@ public class UserNotFoundException extends RuntimeException {
     private final String userId;
 
     public UserNotFoundException(final String userId) {
-        super(String.format(ResponseMessage.USER_ID_NOT_FOUND, userId));
+        super(ResponseMessage.USER_ID_NOT_FOUND);
         this.userId = userId;
     }
 }

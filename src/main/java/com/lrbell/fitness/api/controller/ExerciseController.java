@@ -2,10 +2,10 @@ package com.lrbell.fitness.api.controller;
 
 import com.lrbell.fitness.api.helpers.dto.ExerciseDto;
 import com.lrbell.fitness.api.helpers.dto.GenericDto;
+import com.lrbell.fitness.api.responses.AbstractResponseBody;
+import com.lrbell.fitness.api.responses.OkResponseBody;
 import com.lrbell.fitness.api.responses.exceptions.ExerciseNotFoundException;
 import com.lrbell.fitness.api.helpers.mappers.ExerciseMapper;
-import com.lrbell.fitness.api.responses.AbstractResponse;
-import com.lrbell.fitness.api.responses.OkResponse;
 import com.lrbell.fitness.api.responses.ResponseMessage;
 import com.lrbell.fitness.model.Exercise;
 import com.lrbell.fitness.persistence.ExerciseRepository;
@@ -52,15 +52,15 @@ public class ExerciseController implements UpdatableEntityController<Exercise, E
 
     @Override
     @PostMapping
-    public ResponseEntity<AbstractResponse> create(@RequestBody final Exercise exercise) {
+    public ResponseEntity<AbstractResponseBody> create(@RequestBody final Exercise exercise) {
         exercise.setCreatedAt(System.currentTimeMillis());
         exerciseRepository.save(exercise);
-        return ResponseEntity.ok().body(new OkResponse(ResponseMessage.EXERCISE_CREATED, exercise.getExerciseId()));
+        return ResponseEntity.ok().body(new OkResponseBody(ResponseMessage.EXERCISE_CREATED, exercise.getExerciseId()));
     }
 
     @Override
     @PatchMapping("/{id}")
-    public ResponseEntity<AbstractResponse> update(@PathVariable(value = "id") final String id,
+    public ResponseEntity<AbstractResponseBody> update(@PathVariable(value = "id") final String id,
                                                    @RequestBody final ExerciseDto exerciseDto) {
         final Optional<Exercise> existingExercise = exerciseRepository.findById(id);
 
@@ -69,7 +69,7 @@ public class ExerciseController implements UpdatableEntityController<Exercise, E
             exerciseToUpdate.setUpdatedAt(System.currentTimeMillis());
             exerciseMapper.updateFromDto(exerciseDto, exerciseToUpdate);
             exerciseRepository.save(exerciseToUpdate);
-            return ResponseEntity.ok().body(new OkResponse(ResponseMessage.EXERCISE_UPDATED, id));
+            return ResponseEntity.ok().body(new OkResponseBody(ResponseMessage.EXERCISE_UPDATED, id));
         } else {
             throw new ExerciseNotFoundException(id);
         }
@@ -77,10 +77,10 @@ public class ExerciseController implements UpdatableEntityController<Exercise, E
 
     @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<AbstractResponse> delete(@PathVariable(value= "id") final String id) {
+    public ResponseEntity<AbstractResponseBody> delete(@PathVariable(value= "id") final String id) {
         if (exerciseRepository.findById(id).isPresent()) {
             exerciseRepository.deleteById(id);
-            return ResponseEntity.ok().body(new OkResponse(ResponseMessage.EXERCISE_DELETED, id));
+            return ResponseEntity.ok().body(new OkResponseBody(ResponseMessage.EXERCISE_DELETED, id));
         } else {
             throw new ExerciseNotFoundException(id);
         }

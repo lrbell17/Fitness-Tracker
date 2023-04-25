@@ -26,7 +26,5 @@ public interface WorkoutMapper extends GenericMapper<Workout, WorkoutDto> {
 
     @Override
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "startTime", ignore = true)
-    @Mapping(target = "endTime", ignore = true)
     void updateFromDto(WorkoutDto dto, @MappingTarget Workout entity);
 }

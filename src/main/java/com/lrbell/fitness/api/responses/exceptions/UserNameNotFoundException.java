@@ -9,7 +9,7 @@ public class UserNameNotFoundException extends RuntimeException {
     private String userName;
 
     public UserNameNotFoundException(final String userName) {
-        super(String.format(ResponseMessage.USER_NAME_NOT_FOUND, userName));
+        super(ResponseMessage.USER_NAME_NOT_FOUND);
         this.userName = userName;
     }
 }

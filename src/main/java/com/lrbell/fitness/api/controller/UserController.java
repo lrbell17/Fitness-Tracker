@@ -1,12 +1,12 @@
 package com.lrbell.fitness.api.controller;
 
 import com.lrbell.fitness.api.helpers.dto.GenericDto;
+import com.lrbell.fitness.api.responses.AbstractResponseBody;
+import com.lrbell.fitness.api.responses.OkResponseBody;
 import com.lrbell.fitness.api.responses.exceptions.UserNameNotFoundException;
 import com.lrbell.fitness.api.responses.exceptions.UserNotFoundException;
 import com.lrbell.fitness.api.helpers.mappers.UserMapper;
 import com.lrbell.fitness.api.helpers.dto.UserDto;
-import com.lrbell.fitness.api.responses.AbstractResponse;
-import com.lrbell.fitness.api.responses.OkResponse;
 import com.lrbell.fitness.api.responses.ResponseMessage;
 import com.lrbell.fitness.model.User;
 import com.lrbell.fitness.persistence.UserRepository;
@@ -59,15 +59,15 @@ public class UserController implements UpdatableEntityController<User, UserDto> 
 
     @Override
     @PostMapping
-    public ResponseEntity<AbstractResponse> create(@RequestBody final User user) {
+    public ResponseEntity<AbstractResponseBody> create(@RequestBody final User user) {
         user.setCreatedAt(System.currentTimeMillis());
         userRepository.save(user);
-        return ResponseEntity.ok().body(new OkResponse(ResponseMessage.USER_CREATED, user.getUserId()));
+        return ResponseEntity.ok().body(new OkResponseBody(ResponseMessage.USER_CREATED, user.getUserId()));
     }
 
     @Override
     @PatchMapping("/{id}")
-    public ResponseEntity<AbstractResponse> update(@PathVariable(value = "id") final String id,
+    public ResponseEntity<AbstractResponseBody> update(@PathVariable(value = "id") final String id,
                                                    @RequestBody final UserDto userDto) {
         final Optional<User> existingUser = userRepository.findById(id);
 
@@ -76,7 +76,7 @@ public class UserController implements UpdatableEntityController<User, UserDto> 
             userToUpdate.setUpdatedAt(System.currentTimeMillis());
             userMapper.updateFromDto(userDto, userToUpdate);
             userRepository.save(userToUpdate);
-            return ResponseEntity.ok().body(new OkResponse(ResponseMessage.USER_UPDATED, id));
+            return ResponseEntity.ok().body(new OkResponseBody(ResponseMessage.USER_UPDATED, id));
         } else {
             throw new UserNotFoundException(id);
         }
@@ -84,11 +84,11 @@ public class UserController implements UpdatableEntityController<User, UserDto> 
 
     @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<AbstractResponse> delete(@PathVariable(value = "id") final String id) {
+    public ResponseEntity<AbstractResponseBody> delete(@PathVariable(value = "id") final String id) {
 
         if (userRepository.findById(id).isPresent()) {
             userRepository.deleteById(id);
-            return ResponseEntity.ok().body(new OkResponse(ResponseMessage.USER_DELETED, id));
+            return ResponseEntity.ok().body(new OkResponseBody(ResponseMessage.USER_DELETED, id));
         } else {
             throw new UserNotFoundException(id);
         }

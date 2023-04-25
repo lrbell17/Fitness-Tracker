@@ -58,7 +58,7 @@ public class Workout implements ModelEntity {
 
     public void verifyWorkoutActive() {
         if (this.workoutState != WorkoutState.ACTIVE) {
-            throw new InvalidWorkoutStateException();
+            throw new InvalidWorkoutStateException(this.workoutId);
         }
     }
 }

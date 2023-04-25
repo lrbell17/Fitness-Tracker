@@ -2,11 +2,11 @@ package com.lrbell.fitness.api.controller;
 
 import com.lrbell.fitness.api.helpers.dto.GenericDto;
 import com.lrbell.fitness.api.helpers.dto.WorkoutDto;
+import com.lrbell.fitness.api.responses.AbstractResponseBody;
+import com.lrbell.fitness.api.responses.OkResponseBody;
 import com.lrbell.fitness.api.responses.exceptions.UserNotFoundException;
 import com.lrbell.fitness.api.responses.exceptions.WorkoutNotFoundException;
 import com.lrbell.fitness.api.helpers.mappers.WorkoutMapper;
-import com.lrbell.fitness.api.responses.AbstractResponse;
-import com.lrbell.fitness.api.responses.OkResponse;
 import com.lrbell.fitness.api.responses.ResponseMessage;
 import com.lrbell.fitness.model.User;
 import com.lrbell.fitness.model.Workout;
@@ -59,15 +59,15 @@ public class WorkoutController implements EntityController<Workout, WorkoutDto> 
 
     @Override
     @PostMapping("/start")
-    public ResponseEntity<AbstractResponse> create(@RequestBody final Workout workout) {
+    public ResponseEntity<AbstractResponseBody> create(@RequestBody final Workout workout) {
         workout.setStartTime(System.currentTimeMillis());
         workout.setWorkoutState(WorkoutState.ACTIVE);
         workoutRepository.save(workout);
-        return ResponseEntity.ok().body(new OkResponse(ResponseMessage.WORKOUT_CREATED, workout.getWorkoutId()));
+        return ResponseEntity.ok().body(new OkResponseBody(ResponseMessage.WORKOUT_CREATED, workout.getWorkoutId()));
     }
 
     @PutMapping("/end/{id}")
-    public ResponseEntity<AbstractResponse> endWorkout(@PathVariable(value = "id") final String id) {
+    public ResponseEntity<AbstractResponseBody> endWorkout(@PathVariable(value = "id") final String id) {
         final Optional<Workout> workout = workoutRepository.findById(id);
 
         if (workout.isPresent()) {
@@ -76,7 +76,7 @@ public class WorkoutController implements EntityController<Workout, WorkoutDto> 
             workoutToUpdate.setEndTime(System.currentTimeMillis());
             workoutToUpdate.setWorkoutState(WorkoutState.NOT_ACTIVE);
             workoutRepository.save(workoutToUpdate);
-            return ResponseEntity.ok().body(new OkResponse(ResponseMessage.WORKOUT_ENDED, id));
+            return ResponseEntity.ok().body(new OkResponseBody(ResponseMessage.WORKOUT_ENDED, id));
         } else {
             throw new WorkoutNotFoundException(id);
         }
@@ -84,11 +84,11 @@ public class WorkoutController implements EntityController<Workout, WorkoutDto> 
 
     @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<AbstractResponse> delete(@PathVariable(value = "id") final String id) {
+    public ResponseEntity<AbstractResponseBody> delete(@PathVariable(value = "id") final String id) {
 
         if (workoutRepository.findById(id).isPresent()) {
             workoutRepository.deleteById(id);
-            return ResponseEntity.ok().body(new OkResponse(ResponseMessage.WORKOUT_DELETED, id));
+            return ResponseEntity.ok().body(new OkResponseBody(ResponseMessage.WORKOUT_DELETED, id));
         } else {
             throw new WorkoutNotFoundException(id);
         }

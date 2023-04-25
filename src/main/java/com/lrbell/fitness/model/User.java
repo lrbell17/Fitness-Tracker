@@ -13,6 +13,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,14 +26,14 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "USERS", indexes = @Index(columnList = "userName"))
+@Table(name = "USERS", indexes = @Index(columnList = "userName"), uniqueConstraints = @UniqueConstraint(name = "uk_userName", columnNames = "userName"))
 public class User implements ModelEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String userId;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String userName;
 
     @Column(nullable = false)

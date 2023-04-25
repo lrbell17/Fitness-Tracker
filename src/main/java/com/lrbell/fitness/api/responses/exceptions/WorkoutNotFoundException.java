@@ -9,7 +9,7 @@ public class WorkoutNotFoundException extends RuntimeException {
     private final String workoutId;
 
     public WorkoutNotFoundException(final String workoutId) {
-        super(String.format(ResponseMessage.USER_ID_NOT_FOUND, workoutId));
+        super(ResponseMessage.USER_ID_NOT_FOUND);
         this.workoutId = workoutId;
     }
 }
