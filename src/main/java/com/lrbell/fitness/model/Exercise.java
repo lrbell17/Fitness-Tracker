@@ -26,7 +26,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "EXERCISES", indexes = @Index(columnList = "exerciseName"))
+@Table(name = "EXERCISE", indexes = @Index(columnList = "exerciseName"))
 public class Exercise implements ModelEntity {
 
     @Id

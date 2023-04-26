@@ -2,6 +2,7 @@ package com.lrbell.fitness.api.responses;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.lrbell.fitness.api.responses.exceptions.ExerciseNotFoundException;
+import com.lrbell.fitness.api.responses.exceptions.InvalidUserIdUpdateException;
 import com.lrbell.fitness.api.responses.exceptions.InvalidWorkoutStateException;
 import com.lrbell.fitness.api.responses.exceptions.UserNameNotFoundException;
 import com.lrbell.fitness.api.responses.exceptions.UserNotFoundException;
@@ -58,6 +59,14 @@ public class ExceptionHandlerAdvice {
 
         return ResponseEntity.badRequest().body(
                 new ErrorResponseBody(ResponseMessage.INVALID_WORKOUT_STATE, ex.getWorkoutId())
+        );
+    }
+
+    @ExceptionHandler(InvalidUserIdUpdateException.class)
+    public ResponseEntity<Object> handleInvalidUserIdUpdateException(final InvalidUserIdUpdateException ex) {
+
+        return ResponseEntity.badRequest().body(
+                new ErrorResponseBody(ResponseMessage.INVALID_USER_ID_UPDATE)
         );
     }
 

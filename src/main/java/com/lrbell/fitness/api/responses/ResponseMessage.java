@@ -7,6 +7,7 @@ public final class ResponseMessage {
     public static final String USER_CREATED = "User created successfully";
     public static final String USER_UPDATED = "User updated successfully";
     public static final String USER_DELETED = "User deleted successfully";
+    public static final String INVALID_USER_ID_UPDATE = "The user ID cannot be updated";
     public static final String NON_UNIQUE_USERNAME = "A user with that username already exists";
     public static final String INVALID_GENDER = "Invalid gender";
     public static final String EXERCISE_ID_NOT_FOUND = "Exercise not found";

@@ -15,7 +15,7 @@ import java.util.Optional;
 public class UserDeserializer extends JsonDeserializer<User> {
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Override
     public User deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JacksonException {
