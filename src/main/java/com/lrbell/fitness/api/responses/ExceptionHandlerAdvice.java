@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.lrbell.fitness.api.responses.exceptions.ExerciseNotFoundException;
 import com.lrbell.fitness.api.responses.exceptions.InvalidUserIdUpdateException;
 import com.lrbell.fitness.api.responses.exceptions.InvalidWorkoutStateException;
+import com.lrbell.fitness.api.responses.exceptions.PayloadValidationException;
 import com.lrbell.fitness.api.responses.exceptions.UserNameNotFoundException;
 import com.lrbell.fitness.api.responses.exceptions.UserNotFoundException;
 import com.lrbell.fitness.api.responses.exceptions.WorkoutNotFoundException;
+import com.lrbell.fitness.model.Exercise;
 import com.lrbell.fitness.model.User;
 import com.lrbell.fitness.model.enums.Gender;
 import com.lrbell.fitness.model.enums.MuscleGroup;
@@ -26,7 +28,7 @@ public class ExceptionHandlerAdvice {
     public ResponseEntity<Object> handleUserNotFoundException(final UserNotFoundException ex) {
 
         return new ResponseEntity<>(
-                new ErrorResponseBody(ResponseMessage.USER_ID_NOT_FOUND, ex.getUserId()), HttpStatus.NOT_FOUND
+                new ErrorResponseBody(ex.getMessage()), HttpStatus.NOT_FOUND
         );
     }
 
@@ -34,7 +36,7 @@ public class ExceptionHandlerAdvice {
     public ResponseEntity<Object> handleUserNameNotFoundException(final UserNameNotFoundException ex) {
 
         return new ResponseEntity<>(
-                new ErrorResponseBody(ResponseMessage.USER_NAME_NOT_FOUND, ex.getUserName()), HttpStatus.NOT_FOUND
+                new ErrorResponseBody(ex.getMessage()), HttpStatus.NOT_FOUND
         );
     }
 
@@ -42,7 +44,7 @@ public class ExceptionHandlerAdvice {
     public ResponseEntity<Object> handleExerciseNotFoundException(final ExerciseNotFoundException ex) {
 
         return new ResponseEntity<>(
-                new ErrorResponseBody(ResponseMessage.EXERCISE_ID_NOT_FOUND, ex.getExerciseId()), HttpStatus.NOT_FOUND
+                new ErrorResponseBody(ex.getMessage()), HttpStatus.NOT_FOUND
         );
     }
 
@@ -50,7 +52,7 @@ public class ExceptionHandlerAdvice {
     public ResponseEntity<Object> handleWorkoutNotFoundException(final WorkoutNotFoundException ex) {
 
         return new ResponseEntity<>(
-                new ErrorResponseBody(ResponseMessage.WORKOUT_ID_NOT_FOUND, ex.getWorkoutId()), HttpStatus.NOT_FOUND
+                new ErrorResponseBody(ex.getMessage()), HttpStatus.NOT_FOUND
         );
     }
 
@@ -58,7 +60,7 @@ public class ExceptionHandlerAdvice {
     public ResponseEntity<Object> handleInvalidWorkoutStateException(final InvalidWorkoutStateException ex) {
 
         return ResponseEntity.badRequest().body(
-                new ErrorResponseBody(ResponseMessage.INVALID_WORKOUT_STATE, ex.getWorkoutId())
+                new ErrorResponseBody(ex.getMessage())
         );
     }
 
@@ -66,7 +68,7 @@ public class ExceptionHandlerAdvice {
     public ResponseEntity<Object> handleInvalidUserIdUpdateException(final InvalidUserIdUpdateException ex) {
 
         return ResponseEntity.badRequest().body(
-                new ErrorResponseBody(ResponseMessage.INVALID_USER_ID_UPDATE)
+                new ErrorResponseBody(ex.getMessage())
         );
     }
 
@@ -94,17 +96,32 @@ public class ExceptionHandlerAdvice {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<AbstractResponseBody> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
         final Throwable cause = ex.getCause();
-        final String userTableConstraint = User.class.getAnnotation(Table.class).uniqueConstraints()[0].name().toLowerCase();
+
+        final String userNameTableConstraint = User.class.getAnnotation(Table.class).uniqueConstraints()[0].name().toLowerCase();
+        final String exerciseNameTableConstraint = Exercise.class.getAnnotation(Table.class).uniqueConstraints()[0].name().toLowerCase();
 
         if (cause instanceof ConstraintViolationException) {
             final String constraintName = ((ConstraintViolationException) cause).getConstraintName();
 
-            if (userTableConstraint.equals(constraintName)) {
+            if (userNameTableConstraint.equals(constraintName)) {
                 return ResponseEntity.badRequest().body(
                         new ErrorResponseBody(ResponseMessage.NON_UNIQUE_USERNAME)
+                );
+            } else if (exerciseNameTableConstraint.equals(constraintName)) {
+                return ResponseEntity.badRequest().body(
+                        new ErrorResponseBody(ResponseMessage.NON_UNIQUE_EXERCISE_NAME)
                 );
             }
         }
         throw ex;
+    }
+
+    @ExceptionHandler(PayloadValidationException.class)
+    public ResponseEntity<AbstractResponseBody> handlePayloadValidationException(PayloadValidationException ex) {
+        final String message = String.format(ResponseMessage.PAYLOAD_VALIDATION_ERROR, ex.getMessage());
+
+        return ResponseEntity.badRequest().body(
+                new ErrorResponseBody(message)
+        );
     }
 }
