@@ -14,18 +14,23 @@ import java.util.Optional;
 
 public class UserDeserializer extends JsonDeserializer<User> {
 
+    public static final String USER_NOT_FOUND_DUMMY_NAME = "NOT_FOUND";
+
     @Autowired
     private UserRepository userRepository;
 
     @Override
-    public User deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JacksonException {
+    public User deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException, JacksonException, UserNotFoundException{
         final String userId = jp.getText();
         final Optional<User> user =  userRepository.findById(userId);
 
         if (user.isPresent()) {
             return user.get();
         } else {
-            throw new UserNotFoundException(userId);
+            final User notFoundUser = new User();
+            notFoundUser.setUserId(userId);
+            notFoundUser.setUserName(USER_NOT_FOUND_DUMMY_NAME);
+            return notFoundUser;
         }
     }
 }

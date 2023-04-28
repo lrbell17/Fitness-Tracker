@@ -4,6 +4,7 @@ import com.lrbell.fitness.api.helpers.dto.GenericDto;
 import com.lrbell.fitness.api.helpers.dto.WorkoutDto;
 import com.lrbell.fitness.api.responses.AbstractResponseBody;
 import com.lrbell.fitness.api.responses.OkResponseBody;
+import com.lrbell.fitness.api.responses.exceptions.PayloadValidationException;
 import com.lrbell.fitness.api.responses.exceptions.UserNotFoundException;
 import com.lrbell.fitness.api.responses.exceptions.WorkoutNotFoundException;
 import com.lrbell.fitness.api.helpers.mappers.WorkoutMapper;
@@ -18,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -76,8 +79,7 @@ public class WorkoutController implements UpdatableEntityController<Workout, Wor
         }
     }
 
-    // To-do: handle user not found exception
-
+    //to-do: handle exercise ID not found error
     /**
      * A POST request to start a workout.
      *
@@ -86,7 +88,14 @@ public class WorkoutController implements UpdatableEntityController<Workout, Wor
      */
     @Override
     @PostMapping("/start")
-    public ResponseEntity<AbstractResponseBody> create(@RequestBody final Workout workout) {
+    public ResponseEntity<AbstractResponseBody> create(@Validated @RequestBody final Workout workout, final BindingResult result) throws PayloadValidationException {
+
+        if (result.hasErrors()) {
+            throw new PayloadValidationException(result);
+        }
+
+        workout.verifyExercisesExist();
+        workout.verifyUserExists();
         workout.setStartTime(System.currentTimeMillis());
         workout.setWorkoutState(WorkoutState.ACTIVE);
         workoutRepository.save(workout);
@@ -132,6 +141,7 @@ public class WorkoutController implements UpdatableEntityController<Workout, Wor
             final Workout workoutToUpdate = existingWorkout.get();
             workoutToUpdate.verifyWorkoutActive();
             workoutToUpdate.verifyUserIdNotUpdated(workoutDto.getUserId());
+            workoutToUpdate.verifyExercisesExist();
             workoutMapper.updateFromDto(workoutDto, workoutToUpdate);
             workoutRepository.save(workoutToUpdate);
             return ResponseEntity.ok().body(new OkResponseBody(ResponseMessage.WORKOUT_UPDATED, id));

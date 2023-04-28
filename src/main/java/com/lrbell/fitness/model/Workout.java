@@ -1,10 +1,13 @@
 package com.lrbell.fitness.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.lrbell.fitness.api.helpers.ExerciseDeserializer;
 import com.lrbell.fitness.api.helpers.UserDeserializer;
+import com.lrbell.fitness.api.responses.exceptions.ExerciseNotFoundException;
 import com.lrbell.fitness.api.responses.exceptions.InvalidUserIdUpdateException;
 import com.lrbell.fitness.api.responses.exceptions.InvalidWorkoutStateException;
+import com.lrbell.fitness.api.responses.exceptions.UserNotFoundException;
 import com.lrbell.fitness.model.enums.WorkoutState;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,21 +24,21 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 /**
  * The entity representing a workout.
  */
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
 @Table(name = "WORKOUT", indexes = @Index(columnList = "userId"))
 public class Workout implements ModelEntity {
@@ -59,6 +62,8 @@ public class Workout implements ModelEntity {
     @ManyToOne
     @JoinColumn(name = "userId")
     @JsonDeserialize(using = UserDeserializer.class)
+    @NotNull
+    @JsonProperty("userId")
     private User user;
 
     /**
@@ -98,7 +103,7 @@ public class Workout implements ModelEntity {
      */
     public void verifyWorkoutActive() throws InvalidWorkoutStateException {
         if (this.workoutState != WorkoutState.ACTIVE) {
-            throw new InvalidWorkoutStateException(this.workoutId);
+            throw new InvalidWorkoutStateException();
         }
     }
 
@@ -111,6 +116,36 @@ public class Workout implements ModelEntity {
     public void verifyUserIdNotUpdated(final String userId) throws InvalidUserIdUpdateException {
         if (!(Objects.isNull(userId) || userId.equals(this.getUser().getUserId()))) {
             throw new InvalidUserIdUpdateException();
+        }
+    }
+
+    /**
+     * Verifies that the user ID provided in the payload exists.
+     *
+     * @throws UserNotFoundException
+     */
+    public void verifyUserExists() throws UserNotFoundException {
+        final String userId = this.user.getUserId();
+        final String userName = this.user.getUserName();
+        if (userName.equals(UserDeserializer.USER_NOT_FOUND_DUMMY_NAME)) {
+            throw new UserNotFoundException(userId);
+        }
+    }
+
+    /**
+     * Verifies the list of exercises provided in the payload exist.
+     *
+     * @throws ExerciseNotFoundException
+     */
+    public void verifyExercisesExist() throws ExerciseNotFoundException {
+        final List<Exercise> exerciseList = this.exercises;
+        final List<String> errorMessage = new ArrayList<>();
+
+        if (exerciseList.get(0).getExerciseName().equals(ExerciseDeserializer.EXERCISE_NOT_FOUND_DUMMY_NAME)) {
+            for (Exercise exercise : exerciseList) {
+                errorMessage.add(exercise.getExerciseId());
+            }
+            throw new ExerciseNotFoundException(errorMessage);
         }
     }
 }

@@ -7,6 +7,7 @@ import com.lrbell.fitness.api.responses.OkResponseBody;
 import com.lrbell.fitness.api.responses.exceptions.ExerciseNotFoundException;
 import com.lrbell.fitness.api.helpers.mappers.ExerciseMapper;
 import com.lrbell.fitness.api.responses.ResponseMessage;
+import com.lrbell.fitness.api.responses.exceptions.PayloadValidationException;
 import com.lrbell.fitness.model.Exercise;
 import com.lrbell.fitness.persistence.ExerciseRepository;
 import com.lrbell.fitness.persistence.QueryHelper;
@@ -14,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -40,7 +43,7 @@ public class ExerciseController implements UpdatableEntityController<Exercise, E
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<GenericDto> getById(@PathVariable(value = "id") final String id) {
+    public ResponseEntity<GenericDto> getById(@PathVariable(value = "id") final String id) throws ExerciseNotFoundException {
         final Optional<Exercise> exercise = exerciseRepository.findById(id);
 
         if (exercise.isPresent()) {
@@ -52,7 +55,12 @@ public class ExerciseController implements UpdatableEntityController<Exercise, E
 
     @Override
     @PostMapping
-    public ResponseEntity<AbstractResponseBody> create(@RequestBody final Exercise exercise) {
+    public ResponseEntity<AbstractResponseBody> create(@Validated @RequestBody final Exercise exercise, final BindingResult result) throws PayloadValidationException {
+
+        if (result.hasErrors()) {
+            throw new PayloadValidationException(result);
+        }
+
         exercise.setCreatedAt(System.currentTimeMillis());
         exerciseRepository.save(exercise);
         return ResponseEntity.ok().body(new OkResponseBody(ResponseMessage.EXERCISE_CREATED, exercise.getExerciseId()));
@@ -60,8 +68,7 @@ public class ExerciseController implements UpdatableEntityController<Exercise, E
 
     @Override
     @PatchMapping("/{id}")
-    public ResponseEntity<AbstractResponseBody> update(@PathVariable(value = "id") final String id,
-                                                   @RequestBody final ExerciseDto exerciseDto) {
+    public ResponseEntity<AbstractResponseBody> update(@PathVariable(value = "id") final String id, @RequestBody final ExerciseDto exerciseDto) throws ExerciseNotFoundException {
         final Optional<Exercise> existingExercise = exerciseRepository.findById(id);
 
         if (existingExercise.isPresent()) {
@@ -77,7 +84,7 @@ public class ExerciseController implements UpdatableEntityController<Exercise, E
 
     @Override
     @DeleteMapping("/{id}")
-    public ResponseEntity<AbstractResponseBody> delete(@PathVariable(value= "id") final String id) {
+    public ResponseEntity<AbstractResponseBody> delete(@PathVariable(value= "id") final String id) throws ExerciseNotFoundException {
         if (exerciseRepository.findById(id).isPresent()) {
             exerciseRepository.deleteById(id);
             return ResponseEntity.ok().body(new OkResponseBody(ResponseMessage.EXERCISE_DELETED, id));

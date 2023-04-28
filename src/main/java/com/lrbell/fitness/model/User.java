@@ -14,7 +14,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.persistence.UniqueConstraint;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,19 +24,20 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Table(name = "USERS", indexes = @Index(columnList = "userName"), uniqueConstraints = @UniqueConstraint(name = "uk_userName", columnNames = "userName"))
+@Table(name = "USERS",
+        indexes = @Index(columnList = "userName"),
+        uniqueConstraints = @UniqueConstraint(name = "uk_userName", columnNames = "userName"))
 public class User implements ModelEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String userId;
 
-    @Column(nullable = false)
+    @NotNull
     private String userName;
 
-    @Column(nullable = false)
+    @NotNull
     private String password;
 
     @Column

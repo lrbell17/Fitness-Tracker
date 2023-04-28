@@ -14,7 +14,8 @@ import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import lombok.AllArgsConstructor;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -24,16 +25,18 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Table(name = "EXERCISE", indexes = @Index(columnList = "exerciseName"))
+@Table(name = "EXERCISE",
+        indexes = @Index(columnList = "exerciseName"),
+        uniqueConstraints = @UniqueConstraint(name = "uk_exerciseName", columnNames = "exerciseName"))
 public class Exercise implements ModelEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String exerciseId;
 
-    @Column(unique = true, nullable = false)
+    @Column
+    @NotNull
     private String exerciseName;
 
     @Column
