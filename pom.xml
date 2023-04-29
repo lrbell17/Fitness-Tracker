@@ -94,43 +94,6 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
-<!--			<plugin>-->
-<!--				<groupId>org.apache.maven.plugins</groupId>-->
-<!--				<artifactId>maven-jar-plugin</artifactId>-->
-<!--				<version>3.1.0</version>-->
-<!--				<configuration>-->
-<!--&lt;!&ndash;					<outputDirectory>${dir}</outputDirectory>&ndash;&gt;-->
-<!--					<archive>-->
-<!--						<manifest>-->
-<!--							<addClasspath>true</addClasspath>-->
-<!--							<mainClass>com.lrbell.fitness.FitnessApplication</mainClass>-->
-<!--						</manifest>-->
-<!--					</archive>-->
-<!--				</configuration>-->
-<!--			</plugin>-->
-<!--			<plugin>-->
-<!--				<artifactId>maven-assembly-plugin</artifactId>-->
-<!--				<executions>-->
-<!--					<execution>-->
-<!--						<phase>package</phase>-->
-<!--						<goals>-->
-<!--							<goal>single</goal>-->
-<!--						</goals>-->
-<!--					</execution>-->
-<!--				</executions>-->
-<!--				<configuration>-->
-<!--					<archive>-->
-<!--						<manifest>-->
-<!--							<addClasspath>true</addClasspath>-->
-<!--							<mainClass>com.lrbell.fitness.FitnessApplication</mainClass>-->
-<!--						</manifest>-->
-<!--					</archive>-->
-<!--					<descriptorRefs>-->
-<!--						<descriptorRef>jar-with-dependencies</descriptorRef>-->
-<!--					</descriptorRefs>-->
-<!--&lt;!&ndash;					<outputDirectory>${dir}</outputDirectory>&ndash;&gt;-->
-<!--				</configuration>-->
-<!--			</plugin>-->
 		</plugins>
 	</build>
 

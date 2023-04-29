@@ -26,4 +26,4 @@ PumpPal is a fitness tracking application that allows users to log and track the
 - Stop containers:
 > docker-compose down
 - Remove image: 
->docker rmi docker-spring-boot-postgres:latest
+> docker rmi docker-spring-boot-postgres:latest
